@@ -19,6 +19,15 @@ vpc:
   clusterEndpoints:
     publicAccess: true # TODO switch to private
     #privateAccess: true
+    
+    
+# privateCluster: # This section needs to be uncommented to create a private cluster with VPC endpoints
+  # enabled: true
+  # additionalEndpointServices:
+  # For Cluster Autoscaler
+  - "autoscaling"
+  # CloudWatch logging
+  - "logs"
 
 iam:
 #  serviceRoleARN: arn:aws:iam::406946685607:role/eksClusterRole
@@ -139,6 +148,7 @@ managedNodeGroups:
     volumeSize: 50
     volumeType: gp3
     volumeEncrypted: true
+    # privateNetworking: true  # this needs to be uncommented to create a private cluster
 
   - name: x86-mng-spot
     instanceTypes: [ "m5.2xlarge","m5a.2xlarge","m5d.2xlarge","m5n.2xlarge","m5ad.2xlarge","m5dn.2xlarge","m4.2xlarge" ]
@@ -155,6 +165,7 @@ managedNodeGroups:
       - key: spotInstance
         value: "true"
         effect: PreferNoSchedule
+    # privateNetworking: true  # this needs to be uncommented to create a private cluster
 
 #fargateProfiles:
 #  - name: fargate-test
