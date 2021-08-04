@@ -1,0 +1,95 @@
+apiVersion: crd.projectcalico.org/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-tcp-frontend-to-middletier
+  namespace: default
+spec:
+  selector: tier == 'frontend'
+  types:
+  - Ingress
+  - Egress
+  egress:
+  - action: Allow
+    metadata:
+      annotations:
+        from: frontend
+        to: middletier
+    protocol: TCP
+    source:
+      selector: tier == 'frontend'
+    destination:
+      selector: tier == 'middletier'
+      ports:
+      - 4567
+  ingress:
+  - action: Allow
+---
+apiVersion: crd.projectcalico.org/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-tcp-middletier-to-redis
+  namespace: default
+spec:
+  selector: tier == 'middletier'
+  types:
+  - Ingress
+  - Egress
+  egress:
+  - action: Allow
+    metadata:
+      annotations:
+        from: middletier
+        to: redis
+    protocol: TCP
+    source:
+      selector: tier == 'middletier'
+    destination:
+      selector: tier == 'cache'
+      ports:
+      - 6379
+  ingress:
+  - action: Allow
+    metadata:
+      annotations:
+        from: redis
+        to: middletier
+    protocol: TCP
+    source:
+      selector: tier == 'cache'
+      ports:
+      - 6379
+---
+apiVersion: crd.projectcalico.org/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-tcp-middletier-to-db
+  namespace: default
+spec:
+  selector: tier == 'middletier'
+  types:
+  - Ingress
+  - Egress
+  egress:
+  - action: Allow
+    metadata:
+      annotations:
+        from: middletier
+        to: db
+    protocol: TCP
+    source:
+      selector: tier == 'middletier'
+    destination:
+      selector: tier == 'backenddb'
+      ports:
+      - 5432
+  ingress:
+  - action: Allow
+    metadata:
+      annotations:
+        from: db
+        to: middletier
+    protocol: TCP
+    source:
+      selector: tier == 'backenddb'
+      ports:
+      - 5432
